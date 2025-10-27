@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Script to create and publish Homebrew tap
+
+echo "🍺 Creating Homebrew Tap for Localhost Monitor"
+echo "================================================"
+echo ""
+
+# Configuration
+GITHUB_USER=${GITHUB_USER:-"yourusername"}
+TAP_NAME="homebrew-localhost-monitor"
+FORMULA_NAME="localhost-monitor"
+
+echo "📝 Instructions for creating your Homebrew tap:"
+echo ""
+echo "1. Create a new GitHub repository named: $TAP_NAME"
+echo "   URL: https://github.com/$GITHUB_USER/$TAP_NAME"
+echo ""
+echo "2. Clone the tap repository:"
+echo "   git clone https://github.com/$GITHUB_USER/$TAP_NAME.git"
+echo "   cd $TAP_NAME"
+echo ""
+echo "3. Copy the formula:"
+echo "   cp Formula/localhost-monitor.rb ./"
+echo ""
+echo "4. Create a release on GitHub:"
+echo "   - Go to: https://github.com/$GITHUB_USER/localhost-monitor/releases/new"
+echo "   - Tag: v0.1.0"
+echo "   - Create release and download the tar.gz"
+echo ""
+echo "5. Calculate SHA256 of the release:"
+echo "   shasum -a 256 v0.1.0.tar.gz"
+echo ""
+echo "6. Update the formula's sha256 field with the calculated hash"
+echo ""
+echo "7. Commit and push the formula:"
+echo "   git add localhost-monitor.rb"
+echo "   git commit -m 'Add localhost-monitor formula'"
+echo "   git push origin main"
+echo ""
+echo "8. Install via Homebrew:"
+echo "   brew tap $GITHUB_USER/localhost-monitor"
+echo "   brew install localhost-monitor"
+echo ""
+echo "✅ Done! Users can now install with:"
+echo "   brew tap $GITHUB_USER/localhost-monitor"
+echo "   brew install localhost-monitor"

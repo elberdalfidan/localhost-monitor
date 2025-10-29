@@ -3,8 +3,8 @@
 import rumps
 from typing import Dict, List
 
-from . import process_monitor
-from . import ui_helpers
+import src.process_monitor as process_monitor
+import src.ui_helpers as ui_helpers
 
 
 def kill_all_processes(processes: Dict[int, Dict]) -> tuple[int, int]:

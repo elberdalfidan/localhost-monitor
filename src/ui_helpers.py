@@ -4,7 +4,7 @@ import rumps
 import webbrowser
 from typing import Optional
 
-from . import config
+import src.config as config
 
 
 def create_section_header(title: str) -> rumps.MenuItem:
@@ -124,8 +124,8 @@ def format_process_title(port: int, name: str, is_favorite: bool = False) -> str
     Returns:
         Formatted title string
     """
-    star = "⭐" if is_favorite else "🟢"
-    return f"{star} :{port} → {name}"
+    status = "[FAVORITE]" if is_favorite else "[ACTIVE]"
+    return f"{status} :{port} → {name}"
 
 
 def create_disabled_feature_item(title: str, coming_version: str) -> rumps.MenuItem:

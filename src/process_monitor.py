@@ -6,7 +6,7 @@ import signal
 import os
 from typing import Dict, Optional
 
-from . import config
+import src.config as config
 
 # Cache for process objects to maintain CPU measurement state
 _process_cache: Dict[int, psutil.Process] = {}

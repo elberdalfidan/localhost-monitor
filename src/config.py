@@ -1,6 +1,6 @@
 """Configuration settings for Localhost Monitor."""
 
-from . import __version__
+from src import __version__
 
 # ═══════════════════════════════════════════════════════════
 # App Metadata
@@ -16,24 +16,48 @@ APP_DESCRIPTION = "Monitor and manage localhost development servers from your ma
 WEBSITE_URL = "https://dalfidan.dev"
 
 # App icon (menubar)
-# Place your custom icon in: assets/icons/
-# - icon.png (22x22) or icon@2x.png (44x44)
-# If None, will use emoji (🚀)
+# For bundled app, icon is in Resources/assets/icons/
 import os
+import sys
 from pathlib import Path
 
-# Try to find custom icon
-_icon_dir = Path(__file__).parent.parent / "assets" / "icons"
-_icon_paths = [
-    _icon_dir / "icon@2x.png",  # Retina (preferred)
-    _icon_dir / "icon.png",      # Standard
-]
+def _get_icon_path():
+    """Get menubar icon path (works in both dev and bundled app)."""
+    # Try multiple possible locations
+    possible_paths = []
 
-APP_ICON = None
-for _icon_path in _icon_paths:
-    if _icon_path.exists():
-        APP_ICON = str(_icon_path)
-        break
+    # 1. Bundled app (py2app) - icon in Resources/assets/icons/
+    try:
+        import __main__
+        if hasattr(__main__, '__file__'):
+            main_file = Path(__main__.__file__)
+            # In py2app, main is in Resources/ and assets is in Resources/assets
+            resources_dir = main_file.parent
+            possible_paths.append(resources_dir / "assets" / "icons" / "icon@2x.png")
+            possible_paths.append(resources_dir / "assets" / "icons" / "icon.png")
+    except:
+        pass
+
+    # 2. Development mode - relative to this file
+    try:
+        config_file = Path(__file__)
+        dev_icon_dir = config_file.parent.parent / "assets" / "icons"
+        possible_paths.append(dev_icon_dir / "icon@2x.png")
+        possible_paths.append(dev_icon_dir / "icon.png")
+    except:
+        pass
+
+    # Try all paths
+    for icon_path in possible_paths:
+        try:
+            if icon_path.exists():
+                return str(icon_path)
+        except:
+            continue
+
+    return None
+
+APP_ICON = _get_icon_path()
 
 # ═══════════════════════════════════════════════════════════
 # Core Settings
@@ -136,3 +160,18 @@ SECTION_STYLE = "equals"  # "equals" (═══) or "dashes" (─────) o
 
 # Show section headers in menu
 SHOW_SECTIONS = True
+
+# ═══════════════════════════════════════════════════════════
+# Auto-Update Settings (v0.3.0)
+# ═══════════════════════════════════════════════════════════
+
+# Enable automatic update check on startup
+ENABLE_AUTO_UPDATE_CHECK = True
+
+# Auto-update check interval (in seconds)
+# Default: 86400 seconds = 24 hours
+AUTO_UPDATE_CHECK_INTERVAL = 86400
+
+# Delay before checking for updates on startup (in seconds)
+# This allows the app to fully initialize before checking
+UPDATE_CHECK_ON_STARTUP_DELAY = 5

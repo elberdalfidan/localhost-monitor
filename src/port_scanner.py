@@ -4,7 +4,7 @@ import subprocess
 import re
 from typing import List, Dict, Optional
 
-from . import config
+import src.config as config
 
 
 def scan_ports(start_port: int, end_port: int) -> List[Dict[str, any]]:

@@ -20,6 +20,7 @@ if assets_icons:
 
 OPTIONS = {
     'argv_emulation': False,
+    'iconfile': 'assets/app.icns',  # App icon for Finder/Dock
     'plist': {
         'LSUIElement': True,  # Makes it a menubar-only app (no dock icon)
         'CFBundleName': 'Localhost Monitor',
@@ -27,10 +28,41 @@ OPTIONS = {
         'CFBundleIdentifier': 'com.localhost-monitor',
         'CFBundleVersion': __version__,
         'CFBundleShortVersionString': __version__,
+        'CFBundleIconFile': 'app.icns',  # Icon reference in Info.plist
         'NSHumanReadableCopyright': 'Copyright © 2025 Elber Dalfidan',
     },
-    'packages': ['rumps', 'psutil', 'subprocess', 'threading'],
-    'includes': ['src.port_scanner', 'src.process_monitor', 'src.config'],
+    'packages': [
+        'rumps',
+        'psutil',
+        'urllib',
+        'json',
+        'webbrowser',
+        'pkg_resources',
+        'setuptools'
+    ],
+    'includes': [
+        'src.port_scanner',
+        'src.process_monitor',
+        'src.config',
+        'src.ui_helpers',
+        'src.quick_actions',
+        'src.updater',
+        'jaraco',
+        'jaraco.text',
+        'jaraco.functools',
+        'jaraco.context'
+    ],
+    'excludes': [
+        'tkinter',
+        'PyQt5',
+        'PyQt6',
+        'test',
+        'unittest',
+        'distutils'
+    ],
+    # Use semi_standalone to avoid setuptools/pkg_resources issues
+    'semi_standalone': False,
+    'site_packages': True,
 }
 
 setup(

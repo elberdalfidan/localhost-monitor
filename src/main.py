@@ -4,11 +4,12 @@ import rumps
 import threading
 from typing import Dict, List
 
-from . import config
-from . import port_scanner
-from . import process_monitor
-from . import ui_helpers
-from . import quick_actions
+import src.config as config
+import src.port_scanner as port_scanner
+import src.process_monitor as process_monitor
+import src.ui_helpers as ui_helpers
+import src.quick_actions as quick_actions
+import src.updater as updater
 
 
 class LocalhostMonitorApp(rumps.App):
@@ -26,6 +27,9 @@ class LocalhostMonitorApp(rumps.App):
         self.processes: Dict[int, Dict] = {}  # port -> process info
         self.is_scanning = False
 
+        # Initialize update checker
+        self.updater = updater.UpdateChecker(self)
+
         # Build initial menu
         self.menu = [
             rumps.MenuItem("Refresh", callback=self.refresh_processes),
@@ -35,6 +39,13 @@ class LocalhostMonitorApp(rumps.App):
 
         # Start initial scan
         self.refresh_processes(None)
+
+        # Check for updates on startup (delayed, silent)
+        if config.ENABLE_AUTO_UPDATE_CHECK:
+            rumps.Timer(
+                self._check_updates_startup,
+                config.UPDATE_CHECK_ON_STARTUP_DELAY
+            ).start()
 
     def refresh_processes(self, sender):
         """Refresh the list of processes and update menu."""
@@ -91,7 +102,7 @@ class LocalhostMonitorApp(rumps.App):
 
         # Separator and Quit
         menu.append(rumps.separator)
-        menu.append(rumps.MenuItem("⏏ Quit", callback=self.quit_app))
+        menu.append(rumps.MenuItem("Quit", callback=self.quit_app))
 
         return menu
 
@@ -126,20 +137,20 @@ class LocalhostMonitorApp(rumps.App):
             section.append(header)
 
         # Refresh
-        section.append(rumps.MenuItem("🔄 Refresh", callback=self.refresh_processes))
+        section.append(rumps.MenuItem("Refresh", callback=self.refresh_processes))
 
         # Kill All (if enabled)
         if config.ENABLE_KILL_ALL:
-            kill_all = rumps.MenuItem("⚡ Kill All Ports", callback=self.kill_all_callback)
+            kill_all = rumps.MenuItem("Kill All Ports", callback=self.kill_all_callback)
             section.append(kill_all)
 
         # Favorites (coming soon)
         if config.ENABLE_FAVORITES:
             # Active when implemented
-            section.append(rumps.MenuItem("📌 Favorites", callback=self.favorites_callback))
+            section.append(rumps.MenuItem("Favorites", callback=self.favorites_callback))
         else:
             # Placeholder
-            section.append(ui_helpers.create_disabled_feature_item("📌 Favorites", "0.2.1"))
+            section.append(ui_helpers.create_disabled_feature_item("Favorites", "0.2.1"))
 
         return section
 
@@ -154,16 +165,20 @@ class LocalhostMonitorApp(rumps.App):
             section.append(header)
 
         # About dialog
-        section.append(rumps.MenuItem("ℹ️  About Localhost Monitor", callback=lambda _: ui_helpers.show_about_dialog()))
+        section.append(rumps.MenuItem("About", callback=lambda _: ui_helpers.show_about_dialog()))
 
         # Website
-        section.append(rumps.MenuItem("🌐 Website", callback=lambda _: ui_helpers.open_website()))
+        section.append(rumps.MenuItem("Website", callback=lambda _: ui_helpers.open_website()))
+
+        # Update checker
+        section.append(rumps.separator)
+        section.append(rumps.MenuItem("Check for Updates", callback=self.check_for_updates_callback))
 
         # Settings (coming soon)
         if config.ENABLE_SETTINGS_GUI:
-            section.append(rumps.MenuItem("⚙️  Settings", callback=self.settings_callback))
+            section.append(rumps.MenuItem("Settings", callback=self.settings_callback))
         else:
-            section.append(ui_helpers.create_disabled_feature_item("⚙️  Settings", "0.2.2"))
+            section.append(ui_helpers.create_disabled_feature_item("Settings", "0.2.2"))
 
         return section
 
@@ -172,9 +187,9 @@ class LocalhostMonitorApp(rumps.App):
         return [
             rumps.MenuItem(f"Error: {error_msg}", callback=None),
             rumps.separator,
-            rumps.MenuItem("🔄 Refresh", callback=self.refresh_processes),
+            rumps.MenuItem("Refresh", callback=self.refresh_processes),
             rumps.separator,
-            rumps.MenuItem("⏏ Quit", callback=self.quit_app)
+            rumps.MenuItem("Quit", callback=self.quit_app)
         ]
 
     def create_process_menu(self, port: int, proc_info: Dict) -> rumps.MenuItem:
@@ -213,13 +228,13 @@ class LocalhostMonitorApp(rumps.App):
 
         if config.SHOW_UPTIME:
             submenu_items.append(
-                rumps.MenuItem(f"⏱  {proc_info['uptime_formatted']}", callback=None)
+                rumps.MenuItem(f"Uptime: {proc_info['uptime_formatted']}", callback=None)
             )
 
         # Add separator and kill button
         submenu_items.append(rumps.separator)
         kill_button = rumps.MenuItem(
-            "❌ Kill Process",
+            "Kill Process",
             callback=lambda sender: self.kill_process_callback(port, proc_info['pid'])
         )
         submenu_items.append(kill_button)
@@ -297,6 +312,14 @@ class LocalhostMonitorApp(rumps.App):
             title="Feature Coming Soon",
             message="Settings GUI will be available in v0.2.2"
         )
+
+    def _check_updates_startup(self, sender):
+        """Check for updates on startup (runs once, silent mode)."""
+        self.updater.check_for_updates(silent=True)
+
+    def check_for_updates_callback(self, sender):
+        """Manually check for updates (shows result)."""
+        self.updater.check_for_updates(silent=False)
 
     def quit_app(self, sender):
         """Quit the application."""

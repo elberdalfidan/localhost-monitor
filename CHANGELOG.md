@@ -1,5 +1,55 @@
 # Changelog
 
+## [0.3.0] - 2025-10-29
+
+### ✨ Added
+- **Auto-Update System**: Automatic update checking on startup
+  - Check for new versions via GitHub Releases API
+  - Silent background check 5 seconds after launch
+  - Notification when new version is available
+  - Manual "Check for Updates" option in ABOUT section
+  - Direct link to download latest release
+- **Icon-Free Design**: Removed all emoji/icons for minimal, professional appearance
+  - Process status: `[ACTIVE]` instead of 🟢
+  - Favorites: `[FAVORITE]` instead of ⭐
+  - All menu items now text-only
+  - Terminal/IDE aesthetic
+
+### 🔧 Changed
+- **UI Redesign**: Complete transition to text-based interface
+  - Menu items: "Refresh", "Kill All Ports", "Quit" (no emojis)
+  - Process info: "Uptime:" label instead of ⏱ icon
+  - Cleaner, more professional look
+- **Version System**: Bumped to 0.3.0 for update tracking
+
+### 📝 Technical Details
+
+**Update Checker:**
+```python
+# New module: src/updater.py
+- GitHub API integration (no external dependencies)
+- Version comparison (semantic versioning)
+- Silent and manual check modes
+- Opens releases page in browser
+
+# Configuration in config.py:
+ENABLE_AUTO_UPDATE_CHECK = True
+AUTO_UPDATE_CHECK_INTERVAL = 86400  # 24 hours
+UPDATE_CHECK_ON_STARTUP_DELAY = 5  # seconds
+```
+
+**Icon Removal:**
+- All emojis removed from UI
+- Text-based status indicators
+- Professional terminal aesthetic
+- Better for accessibility
+
+### 🎯 User Experience
+- Users are notified of updates automatically
+- One-click access to latest release
+- No manual GitHub checking required
+- Seamless update workflow
+
 ## [0.2.0] - 2025-10-26
 
 ### ✨ Added

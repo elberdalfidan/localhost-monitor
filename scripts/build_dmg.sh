@@ -32,8 +32,9 @@ rm -f "${DMG_NAME}.dmg"
 echo "📁 Creating DMG structure..."
 mkdir -p "$DMG_DIR"
 
-# Copy app to DMG directory
-cp -r "$SOURCE_DIR/$APP_NAME.app" "$DMG_DIR/"
+# Copy app to DMG directory (use ditto to preserve all metadata and structure)
+echo "📋 Copying app bundle..."
+ditto "$SOURCE_DIR/$APP_NAME.app" "$DMG_DIR/$APP_NAME.app"
 
 # Create Applications symlink
 ln -s /Applications "$DMG_DIR/Applications"

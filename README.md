@@ -15,6 +15,10 @@
 
 ---
 
+<div align="center">
+ <img src="assets/demos/demo-menubar.gif" alt="Localhost Monitor Demo" width="600">
+</div>
+
 ## ✨ Features
 
 - 🔍 **Auto-detect** processes running on localhost ports (3000-9000)
